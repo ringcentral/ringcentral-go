@@ -31,7 +31,7 @@ type TokenInfo struct {
 }
 
 // Authorize an user
-func (rc RestClient) Authorize(username string, extension string, password string) TokenInfo {
+func (rc *RestClient) Authorize(username string, extension string, password string) {
 	data := url.Values{
 		"grant_type": []string{"password"},
 		"username":   []string{username},
@@ -39,9 +39,7 @@ func (rc RestClient) Authorize(username string, extension string, password strin
 		"password":   []string{password},
 	}
 	bytes := rc.Request("POST", "/restapi/oauth/token", "application/x-www-form-urlencoded", strings.NewReader(data.Encode()))
-	var tokenInfo TokenInfo
-	json.Unmarshal(bytes, &tokenInfo)
-	return tokenInfo
+	json.Unmarshal(bytes, &rc.Token)
 }
 
 // Get HTTP GET
