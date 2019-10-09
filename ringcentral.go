@@ -25,11 +25,6 @@ type RestClient struct {
 	Token        *TokenInfo
 }
 
-// TokenInfo token info
-type TokenInfo struct {
-	AccessToken string `json:"access_token"`
-}
-
 // Authorize an user
 func (rc *RestClient) Authorize(username string, extension string, password string) {
 	data := url.Values{
