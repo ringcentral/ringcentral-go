@@ -3,6 +3,7 @@ package ringcentral
 import (
 	"encoding/base64"
 	"encoding/json"
+	"github.com/ringcentral/ringcentral/definitions"
 	"io"
 	"io/ioutil"
 	"log"
@@ -22,7 +23,7 @@ type RestClient struct {
 	ClientID     string
 	ClientSecret string
 	Server       string
-	Token        *TokenInfo
+	Token        *definitions.TokenInfo
 }
 
 // Authorize an user

@@ -1,4 +1,4 @@
-package ringcentral
+package definitions
 
 // TokenInfo token info
 type TokenInfo struct {
