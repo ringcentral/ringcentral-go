@@ -47,6 +47,11 @@ func (rc RestClient) Get(endpoint string) []byte {
 	return rc.Request("GET", endpoint, "", nil)
 }
 
+// Post HTTP POST
+func (rc RestClient) Post(endpoint string, body io.Reader) []byte {
+	return rc.Request("POST", endpoint, "application/json", body)
+}
+
 // Request HTTP request
 func (rc RestClient) Request(method, endpoint, contentType string, body io.Reader) []byte {
 	req, err := http.NewRequest(method, rc.Server+endpoint, body)
