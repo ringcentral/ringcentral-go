@@ -1,0 +1,13 @@
+{
+  "license": "MIT",
+  "scripts": {
+    "generate": "node -r @babel/register definitions.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/register": "^7.6.2",
+    "standard": "^14.3.1",
+    "yarn-upgrade-all": "^0.5.2"
+  }
+}
