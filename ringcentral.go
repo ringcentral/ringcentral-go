@@ -43,6 +43,11 @@ func (rc RestClient) Get(endpoint string) []byte {
 	return rc.Request("GET", endpoint, "", nil)
 }
 
+// Delete HTTP DELETE
+func (rc RestClient) Delete(endpoint string) []byte {
+	return rc.Request("DELETE", endpoint, "", nil)
+}
+
 // Post HTTP POST
 func (rc RestClient) Post(endpoint string, body io.Reader) []byte {
 	return rc.Request("POST", endpoint, "application/json", body)
@@ -51,6 +56,11 @@ func (rc RestClient) Post(endpoint string, body io.Reader) []byte {
 // Put HTTP PUT
 func (rc RestClient) Put(endpoint string, body io.Reader) []byte {
 	return rc.Request("PUT", endpoint, "application/json", body)
+}
+
+// Patch HTTP PATCH
+func (rc RestClient) Patch(endpoint string, body io.Reader) []byte {
+	return rc.Request("PATCH", endpoint, "application/json", body)
 }
 
 // Request HTTP request
