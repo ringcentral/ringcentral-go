@@ -8,14 +8,26 @@ const outputDir = '../definitions'
 
 const doc = yaml.safeLoad(fs.readFileSync('/Users/tyler.liu/src/dotnet/RingCentral.Net/code-generator/rc-platform-adjusted.yml', 'utf8'))
 const definitions = doc.definitions
-const models = Object.keys(definitions).map(k => ({ name: k, ...definitions[k] })).filter(m => m.name === 'TokenInfo')
+const models = Object.keys(definitions).map(k => ({ name: k, ...definitions[k] })).filter(m => m.type !== 'array')
 
-const normalizeType = type => {
-  switch (type) {
-    case 'integer':
-      return 'int'
-    default:
-      return type
+const normalizeType = p => {
+  if (p.type === 'integer') {
+    return 'int'
+  } else if (p.type === 'array') {
+    return `[]${normalizeType(p.items)}`
+  } else if (p.type === undefined || p.type === 'object') {
+    if (!p.$ref) {
+      return 'interface{}' // anonymous object
+    }
+    return p.$ref.split('/').slice(-1)[0]
+  } else if (p.type === 'boolean') {
+    return 'bool'
+  } else if (p.type === 'file') {
+    return 'Attachment'
+  } else if (p.type === 'string') {
+    return 'string'
+  } else {
+    throw new Error(`Unknown type ${p.type}`)
   }
 }
 
@@ -26,7 +38,7 @@ for (const model of models) {
 type ${model.name} struct {
 ${
   Object.keys(model.properties).map(k => ({ name: k, ...model.properties[k] }))
-    .map(p => `\t${pascalCase(p.name)} ${normalizeType(p.type)} \`json:"${p.name}"\``).join('\n')
+    .map(p => `\t${pascalCase(p.name)} ${normalizeType(p)} \`json:"${p.name}"\``).join('\n')
 }
 }
 `

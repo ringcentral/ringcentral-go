@@ -1,7 +1,7 @@
 {
   "license": "MIT",
   "scripts": {
-    "generate": "node -r @babel/register definitions.js"
+    "generate": "rm -rf ../definitions/* && node -r @babel/register definitions.js"
   },
   "dependencies": {
     "pascal-case": "^2.0.1",
