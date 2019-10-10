@@ -3,6 +3,10 @@
   "scripts": {
     "generate": "node -r @babel/register definitions.js"
   },
+  "dependencies": {
+    "pascal-case": "^2.0.1",
+    "to-start-case": "^1.1.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.6.4",
     "@babel/preset-env": "^7.6.3",
