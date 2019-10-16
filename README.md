@@ -13,7 +13,7 @@ package main
 import (
 	"os"
 
-	"github.com/ringcentral/ringcentral"
+	"github.com/ringcentral/ringcentral-go"
 )
 
 func main() {
@@ -36,5 +36,6 @@ func main() {
 
 ```go
 bytes := rc.Post("/restapi/v1.0/client-info/sip-provision", strings.NewReader(`{"sipInfo":[{"transport":"WSS"}]}`))
+println(string(bytes))
 println(string(bytes))
 ```
