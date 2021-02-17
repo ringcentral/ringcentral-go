@@ -1,0 +1,4 @@
+github.com/joho/godotenv v1.3.0 h1:Zjp+RcGpHhGlrMbJzXTrZZPrWj+1vfm90La1wgB6Bhc=
+github.com/joho/godotenv v1.3.0/go.mod h1:7hK45KPybAkOC6peb+G5yklZfMxEjkZhHbwpqxOKXbg=
+github.com/ringcentral/ringcentral-go v0.0.0-20191016180526-09829c1bf7bf h1:ynU9tCpD2aiRJTvjjZZaX8zg6Bl5xDqbFg/eYP1rlnQ=
+github.com/ringcentral/ringcentral-go v0.0.0-20191016180526-09829c1bf7bf/go.mod h1:QtAsJQ0qjov+hRT0xL7b8dJODovDhA8zGJsUTbjLrOg=
