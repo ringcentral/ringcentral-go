@@ -3,12 +3,12 @@ package ringcentral
 import (
 	"encoding/base64"
 	"encoding/json"
-	"github.com/ringcentral/ringcentral-go/definitions"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"ringcentral.com/ringcentral/definitions"
 	"strings"
 )
 

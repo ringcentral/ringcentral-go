@@ -13,7 +13,7 @@ package main
 import (
 	"os"
 
-	"github.com/ringcentral/ringcentral-go"
+	"ringcentral.com/ringcentral"
 )
 
 func main() {
