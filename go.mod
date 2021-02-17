@@ -1,4 +1,4 @@
-module ringcentral.com/ringcentral
+module ringcentral-go
 
 go 1.15
 

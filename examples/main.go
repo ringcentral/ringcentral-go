@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
-	"ringcentral.com/ringcentral"
-	"ringcentral.com/ringcentral/definitions"
+	"github.com/ringcentral/ringcentral-go"
+	"github.com/ringcentral/ringcentral-go/definitions"
 )
 
 func main() {

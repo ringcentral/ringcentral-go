@@ -8,8 +8,9 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"ringcentral.com/ringcentral/definitions"
 	"strings"
+
+	"github.com/ringcentral/ringcentral-go/definitions"
 )
 
 // ProductionServer RingCentral production server url
