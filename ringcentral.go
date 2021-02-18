@@ -28,22 +28,20 @@ type TokenInfo struct {
 
 // GetTokenRequest Get Token Request
 type GetTokenRequest struct {
-	Username       string `json:"username"`
-	Password       string `json:"password"`
-	Extension      string `json:"extension"`
-	GrantType      string `json:"grant_type"`
-	Code           string `json:"code"`
-	RedirectURI    string `json:"redirect_uri"`
-	AccessTokenTTL string `json:"access_token_ttl"`
-
-	RefreshTokenTTL string `json:"refresh_token_ttl"`
-	Scope           string `json:"scope"`
-	RefreshToken    string `json:"refresh_token"`
-	EndpointID      string `json:"endpoint_id"`
-	Pin             string `json:"pin"`
-	ClientID        string `json:"client_id"`
-	AccountID       string `json:"account_id"`
-
+	Username            string `json:"username"`
+	Password            string `json:"password"`
+	Extension           string `json:"extension"`
+	GrantType           string `json:"grant_type"`
+	Code                string `json:"code"`
+	RedirectURI         string `json:"redirect_uri"`
+	AccessTokenTTL      string `json:"access_token_ttl"`
+	RefreshTokenTTL     string `json:"refresh_token_ttl"`
+	Scope               string `json:"scope"`
+	RefreshToken        string `json:"refresh_token"`
+	EndpointID          string `json:"endpoint_id"`
+	Pin                 string `json:"pin"`
+	ClientID            string `json:"client_id"`
+	AccountID           string `json:"account_id"`
 	PartnerAccountID    string `json:"partner_account_id"`
 	ClientAssertionType string `json:"client_assertion_type"`
 	ClientAssertion     string `json:"client_assertion"`
@@ -62,24 +60,26 @@ type RestClient struct {
 
 // Authorize an user
 func (rc *RestClient) Authorize(getTokenRequest GetTokenRequest) {
-	data := url.Values{}
-	iVal := reflect.ValueOf(&getTokenRequest).Elem()
-	typ := iVal.Type()
-	for i := 0; i < iVal.NumField(); i++ {
-		if fmt.Sprint(iVal.Field(i)) != "" {
-			data.Set(typ.Field(i).Tag.Get("json"), fmt.Sprint(iVal.Field(i)))
+	body := url.Values{}
+	rValue := reflect.ValueOf(&getTokenRequest).Elem()
+	rType := rValue.Type()
+	for i := 0; i < rValue.NumField(); i++ {
+		fieldValue := fmt.Sprint(rValue.Field(i))
+		if fieldValue != "" {
+			body.Set(rType.Field(i).Tag.Get("json"), fieldValue)
 		}
 	}
-	bytes := rc.Request("POST", "/restapi/oauth/token", "application/x-www-form-urlencoded", strings.NewReader(data.Encode()))
+	bytes := rc.Request("POST", "/restapi/oauth/token", "application/x-www-form-urlencoded", strings.NewReader(body.Encode()))
 	json.Unmarshal(bytes, &rc.Token)
 }
 
 // Revoke revoke current token
-func (rc RestClient) Revoke() {
+func (rc *RestClient) Revoke() {
 	if rc.Token == nil {
 		return
 	}
-	// todo: revoke token
+	rc.Post("/restapi/oauth/revoke", strings.NewReader(fmt.Sprintf(`{token: "%s"}`, rc.Token.AccessToken)))
+	rc.Token = nil
 }
 
 // Request HTTP request
@@ -88,6 +88,7 @@ func (rc RestClient) Request(method, endpoint, contentType string, body io.Reade
 	if err != nil {
 		log.Fatal(err)
 	}
+	// todo: diffrent method to determine token type
 	if rc.Token == nil {
 		req.Header.Add("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(rc.ClientID+":"+rc.ClientSecret)))
 	} else {

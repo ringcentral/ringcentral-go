@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestHello(t *testing.T) {
+func TestAuthorize(t *testing.T) {
 	rc := RestClient{
 		ClientID:     os.Getenv("RINGCENTRAL_CLIENT_ID"),
 		ClientSecret: os.Getenv("RINGCENTRAL_CLIENT_SECRET"),
@@ -20,6 +20,12 @@ func TestHello(t *testing.T) {
 	})
 
 	if len(rc.Token.AccessToken) <= 0 {
-		t.Errorf("access token length invalid")
+		t.Error("access token length invalid")
+	}
+
+	rc.Revoke()
+
+	if rc.Token != nil {
+		t.Error("Revoke failed")
 	}
 }
