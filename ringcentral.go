@@ -84,15 +84,14 @@ func (rc *RestClient) Revoke() {
 
 // Request HTTP request
 func (rc RestClient) Request(method, endpoint, contentType string, body io.Reader) []byte {
-	req, err := http.NewRequest(method, rc.Server+endpoint, body)
+	req, err := http.NewRequest(method, fmt.Sprintf("%s%s", rc.Server, endpoint), body)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// todo: diffrent method to determine token type
-	if rc.Token == nil {
-		req.Header.Add("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(rc.ClientID+":"+rc.ClientSecret)))
+	if endpoint == "/restapi/oauth/token" || endpoint == "/restapi/oauth/revoke" {
+		req.Header.Add("Authorization", fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", rc.ClientID, rc.ClientSecret)))))
 	} else {
-		req.Header.Add("Authorization", "Bearer "+rc.Token.AccessToken)
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", rc.Token.AccessToken))
 	}
 	if contentType != "" {
 		req.Header.Add("Content-Type", contentType)
