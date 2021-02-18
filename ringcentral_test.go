@@ -1,7 +1,6 @@
 package ringcentral
 
 import (
-	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -46,9 +45,9 @@ func TestAPICall(t *testing.T) {
 		Password:  os.Getenv("RINGCENTRAL_PASSWORD"),
 	})
 
-	bytes := rc.Post("/restapi/v1.0/client-info/sip-provision", strings.NewReader(`{"sipInfo":[{"transport":"WSS"}]}`))
+	rc.Post("/restapi/v1.0/client-info/sip-provision", strings.NewReader(`{"sipInfo":[{"transport":"WSS"}]}`))
 	// fmt.Println(bytes)
-	fmt.Println(len(bytes))
+	// fmt.Println(len(bytes))
 	// if len(bytes) <= 0 {
 	// 	t.Error("Response is empty")
 	// }
