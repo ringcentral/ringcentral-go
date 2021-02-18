@@ -1,6 +1,7 @@
 package ringcentral
 
 import (
+	"encoding/json"
 	"os"
 	"strings"
 	"testing"
@@ -45,12 +46,13 @@ func TestAPICall(t *testing.T) {
 		Password:  os.Getenv("RINGCENTRAL_PASSWORD"),
 	})
 
-	rc.Post("/restapi/v1.0/client-info/sip-provision", strings.NewReader(`{"sipInfo":[{"transport":"WSS"}]}`))
-	// fmt.Println(bytes)
-	// fmt.Println(len(bytes))
-	// if len(bytes) <= 0 {
-	// 	t.Error("Response is empty")
-	// }
+	bytes := rc.Post("/restapi/v1.0/client-info/sip-provision", strings.NewReader(`{"sipInfo":[{"transport":"WSS"}]}`))
+	var createSipRegistrationResponse CreateSipRegistrationResponse
+	json.Unmarshal(bytes, &createSipRegistrationResponse)
+
+	if len(createSipRegistrationResponse.SipInfo) <= 0 {
+		t.Error("No SipInfo")
+	}
 
 	rc.Revoke()
 }
