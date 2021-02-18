@@ -3,40 +3,49 @@ package ringcentral
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"reflect"
 	"strings"
-
-	"github.com/ringcentral/ringcentral-go/definitions"
 )
 
-// ProductionServer RingCentral production server url
-const ProductionServer = "https://platform.ringcentral.com"
-
-// SandboxServer RingCentral sandbox server url
-const SandboxServer = "https://platform.devtest.ringcentral.com"
-
-// RestClient RingCentral Restful client
+// RestClient Restful Client
 type RestClient struct {
 	ClientID     string
 	ClientSecret string
 	Server       string
-	Token        *definitions.TokenInfo
+	Token        *TokenInfo
 }
 
-// Authorize an user
-func (rc *RestClient) Authorize(username string, extension string, password string) {
-	data := url.Values{
-		"grant_type": []string{"password"},
-		"username":   []string{username},
-		"extension":  []string{extension},
-		"password":   []string{password},
+// Request HTTP request
+func (rc RestClient) Request(method, endpoint, contentType string, body io.Reader) []byte {
+	req, err := http.NewRequest(method, fmt.Sprintf("%s%s", rc.Server, endpoint), body)
+	if err != nil {
+		log.Fatal(err)
 	}
-	bytes := rc.Request("POST", "/restapi/oauth/token", "application/x-www-form-urlencoded", strings.NewReader(data.Encode()))
-	json.Unmarshal(bytes, &rc.Token)
+	if endpoint == "/restapi/oauth/token" || endpoint == "/restapi/oauth/revoke" {
+		req.Header.Add("Authorization", fmt.Sprintf("Basic %s", base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%s:%s", rc.ClientID, rc.ClientSecret)))))
+	} else {
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", rc.Token.AccessToken))
+	}
+	if contentType != "" {
+		req.Header.Add("Content-Type", contentType)
+	}
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+	bytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return bytes
 }
 
 // Get HTTP GET
@@ -64,29 +73,26 @@ func (rc RestClient) Patch(endpoint string, body io.Reader) []byte {
 	return rc.Request("PATCH", endpoint, "application/json", body)
 }
 
-// Request HTTP request
-func (rc RestClient) Request(method, endpoint, contentType string, body io.Reader) []byte {
-	req, err := http.NewRequest(method, rc.Server+endpoint, body)
-	if err != nil {
-		log.Fatal(err)
+// Authorize an user
+func (rc *RestClient) Authorize(getTokenRequest GetTokenRequest) {
+	body := url.Values{}
+	rValue := reflect.ValueOf(&getTokenRequest).Elem()
+	rType := rValue.Type()
+	for i := 0; i < rValue.NumField(); i++ {
+		fieldValue := fmt.Sprint(rValue.Field(i))
+		if fieldValue != "" {
+			body.Set(rType.Field(i).Tag.Get("json"), fieldValue)
+		}
 	}
+	bytes := rc.Request("POST", "/restapi/oauth/token", "application/x-www-form-urlencoded", strings.NewReader(body.Encode()))
+	json.Unmarshal(bytes, &rc.Token)
+}
+
+// Revoke revoke current token
+func (rc *RestClient) Revoke() {
 	if rc.Token == nil {
-		req.Header.Add("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(rc.ClientID+":"+rc.ClientSecret)))
-	} else {
-		req.Header.Add("Authorization", "Bearer "+rc.Token.AccessToken)
+		return
 	}
-	if contentType != "" {
-		req.Header.Add("Content-Type", contentType)
-	}
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer resp.Body.Close()
-	bytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return bytes
+	rc.Post("/restapi/oauth/revoke", strings.NewReader(fmt.Sprintf(`{token: "%s"}`, rc.Token.AccessToken)))
+	rc.Token = nil
 }
